@@ -6,14 +6,15 @@ const mongoose = require("mongoose");
 const config = require('./database/config.js');
 var router = require('express').Router();
 
-const alta = require("./user/alta.js")
-const entrada = require("./user/entrada.js");
-const salida = require("./user/salida.js");
-const comienzaMes = require("./user/comienzaMes.js");
-const pagoDeResidentes = require("./user/pagoDeResidentes.js");
+const NewPlate = require("./user/newPlate.js")
+const Entrance = require("./user/entrance.js");
+const Exit = require("./user/exit.js");
+const MonthStart = require("./user/monthStart.js");
+const ResidentsBill = require("./user/residentsBill.js");
 
 var db;
 var port = 8080;
+
 
 mongoose.connect(config.db, { useNewUrlParser: true, useUnifiedTopology: true}, (err, res) => {
     if (err) {
@@ -30,12 +31,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use('/server', router);
-app.post('/server/alta/',alta.alta);
-app.post('/server/entrada/',entrada.entrada);
-app.post('/server/salida/',salida.salida);
-app.delete('/server/comienzaMes/',comienzaMes.comienzaMes);
-app.get('/server/pagoDeResidentes/',pagoDeResidentes.pagoDeResidentes);
-
+app.post('/server/newPlate/',NewPlate.newPlate);
+app.post('/server/entrance/',Entrance.entrance);
+app.post('/server/exit/',Exit.exit);
+app.delete('/server/monthStart/',MonthStart.monthStart);
+app.get('/server/residentsBill/',ResidentsBill.residentsBill);
 
 console.log(`Server listening on port ${port}`);
 module.exports = {mongoose, db, port};

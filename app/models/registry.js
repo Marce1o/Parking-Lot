@@ -2,11 +2,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const Registro = new Schema({
-    uid: String,
+const Registry = new Schema({
+    uid: Number,
     plate: String,
     checkIn: String,
     checkOut: String
 });
 
-module.exports = mongoose.model('Registro', Registro);
+module.exports = mongoose.model('Registry', Registry);

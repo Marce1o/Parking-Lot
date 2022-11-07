@@ -1,7 +1,7 @@
-const Vehiculos = require('../models/vehiculos.js');
-const PorCobrar= require('../models/porCobrar.js');
+const Vehicules = require('../models/vehicules.js');
+const ToCharge = require('../models/toCharge.js');
 
-async function pagoDeResidentes(req,res){
+async function residentsBill(req,res){
     let body = JSON.stringify(req.body);
   
     try{
@@ -11,11 +11,11 @@ async function pagoDeResidentes(req,res){
         return;
     }
 
-    let residents = await Vehiculos.find({type:'notresident'});
+    let residents = await Vehicules.find({type:'resident'});
     let bills = [];
  
     for(let i = 0; i<residents.length; i++){
-        let resident = await PorCobrar.findOne({plate:residents[i].plate});
+        let resident = await ToCharge.findOne({plate:residents[i].plate});
         if(!resident){
             continue;
         }
@@ -30,6 +30,4 @@ async function pagoDeResidentes(req,res){
     res.status(200).send(bills);
 }
 
-module.exports ={
-    pagoDeResidentes
-}
+module.exports = { residentsBill };

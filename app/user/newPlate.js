@@ -1,6 +1,6 @@
-const Vehiculo = require('../models/vehiculos.js');
+const Vehicules = require('../models/vehicules.js');
 
-async function alta(req,res){
+async function newPlate(req,res){
     let body = JSON.stringify(req.body);
   
     try{
@@ -33,23 +33,21 @@ async function alta(req,res){
         return;
     }
 
-    if(await Vehiculo.findOne({plate:body.plate})){
+    if(await Vehicules.findOne({plate:body.plate})){
         res.status(418).send(`${body.plate} plate is already in registry`);
         return;
     }
 
-    let vehicule = new Vehiculo({
-        uid : await Vehiculo.find({}).count(),
+    let Vehicules = new Vehicules({
+        uid : await Vehicules.find({}).count(),
         plate : body.plate,
         type : body.type
     });
 
-    vehicule.save();
+    Vehicules.save();
 
-    let output = `Set up for ${body.type} vehicule with plate ${body.plate} was done successfully!`;
+    let output = `Set up for ${body.type} Vehicules with plate ${body.plate} was done successfully!`;
     res.status(201).send(output);
 }
 
-module.exports ={
-    alta
-}
+module.exports = { newPlate };

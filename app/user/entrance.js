@@ -1,7 +1,7 @@
-const Registro = require('../models/registro.js');
-const Vehiculos = require('../models/vehiculos.js');
+const Registry = require('../models/registry.js');
+const Vehicules = require('../models/vehicules.js');
 
-async function entrada(req,res){
+async function entrance(req,res){
     let body = JSON.stringify(req.body);
   
     try{
@@ -18,18 +18,18 @@ async function entrada(req,res){
 
     body.plate = body.plate.toUpperCase();
 
-    if(!(await Vehiculos.findOne({plate:body.plate}))){
+    if(!(await Vehicules.findOne({plate:body.plate}))){
         res.status(418).send(`${body.plate} plate is not in registry!`);
         return;
     }
 
-    if(await Registro.findOne({plate:body.plate, checkOut : {"$exists" : false}})){
+    if(await Registry.findOne({plate:body.plate, checkOut : {"$exists" : false}})){
         res.status(418).send(`${body.plate} already in!`);
         return;
     }
 
-    let record = new Registro({
-        uid : await Registro.find({}).count(),
+    let record = new Registry({
+        uid : await Registry.find({}).count(),
         plate : body.plate,
         checkIn : Math.floor(Date.now()/1000/60)
     });
@@ -40,6 +40,4 @@ async function entrada(req,res){
     res.status(202).send(output);
 }
 
-module.exports ={
-    entrada
-}
+module.exports = { entrance };

@@ -2,10 +2,10 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const PorCobrar = new Schema({
-    uid: String,
+const ToCharge = new Schema({
+    uid: Number,
     plate: String,
     minutes: String
 });
 
-module.exports = mongoose.model('PorCobrar', PorCobrar);
+module.exports = mongoose.model('ToCharge', ToCharge);

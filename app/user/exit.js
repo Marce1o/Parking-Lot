@@ -1,8 +1,8 @@
-const Registro = require('../models/registro.js');
-const Vehiculos = require('../models/vehiculos.js');
-const PorCobrar= require('../models/porCobrar.js');
+const Registry = require('../models/registry.js');
+const Vehicules = require('../models/vehicules.js');
+const ToCharge= require('../models/toCharge.js');
 
-async function salida(req,res){
+async function exit(req,res){
     req = JSON.stringify(req.body);
   
     try{
@@ -19,24 +19,24 @@ async function salida(req,res){
 
     req.plate = req.plate.toUpperCase();
 
-    if(!(await Vehiculos.findOne({plate:req.plate}))){
+    if(!(await Vehicules.findOne({plate:req.plate}))){
         res.status(418).send(`${req.plate} plate is not in registry!`);
         return;
     }
 
-    if(!(await Registro.findOne({plate:req.plate, checkOut : {"$exists" : false}}))){
+    if(!(await Registry.findOne({plate:req.plate, checkOut : {"$exists" : false}}))){
         res.status(418).send(`${req.plate} is not in the parking lot!`);
         return;
     }
 
-    var old = await Registro.findOne({plate:req.plate, checkOut : {"$exists" : false}});
+    var old = await Registry.findOne({plate:req.plate, checkOut : {"$exists" : false}});
     old.checkOut=Math.floor(Date.now()/1000/60);
 
-    await Registro.replaceOne({uid:old.uid},old);
+    await Registry.replaceOne({uid:old.uid},old);
 
     let newMinutes = old.checkOut - old.checkIn;
 
-    if((await Vehiculos.findOne({plate:req.plate})).type == 'notresident'){
+    if((await Vehicules.findOne({plate:req.plate})).type == 'notresident'){
         let bill = {
             plate : req.plate,
             minutes : newMinutes,
@@ -49,13 +49,13 @@ async function salida(req,res){
         return;
     }
 
-    if((await Vehiculos.findOne({plate:req.plate})).type == 'resident'){
-        var bill = await PorCobrar.findOne({plate:req.plate});
+    if((await Vehicules.findOne({plate:req.plate})).type == 'resident'){
+        var bill = await ToCharge.findOne({plate:req.plate});
         if(bill){
             bill.minutes = parseInt(bill.minutes) + (newMinutes);
-            await PorCobrar.replaceOne({uid:bill.uid},bill);
+            await ToCharge.replaceOne({uid:bill.uid},bill);
         }else{
-            bill = new PorCobrar({
+            bill = new ToCharge({
                 uid : await billLength(),
                 plate : req.plate,
                 minutes : newMinutes
@@ -68,10 +68,8 @@ async function salida(req,res){
     res.status(202).send(output);
 
     async function billLength(){
-        return await PorCobrar.find({}).count();
+        return await ToCharge.find({}).count();
     }
 }
 
-module.exports ={
-    salida
-}
+module.exports = { exit };
