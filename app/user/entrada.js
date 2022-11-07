@@ -2,48 +2,42 @@ const Registro = require('../models/registro.js');
 const Vehiculos = require('../models/vehiculos.js');
 
 async function entrada(req,res){
-    console.clear();
-    req = JSON.stringify(req.body);
+    let body = JSON.stringify(req.body);
   
     try{
-       var req =  JSON.parse(req);
+       body =  JSON.parse(body);
     }catch{
         res.status(400).send('Input error: Not a JSON');
         return;
     }
 
-    if(!req.hasOwnProperty('plate')){
+    if(!body.hasOwnProperty('plate')){
         res.status(400).send('Input error: Missing plate');
         return;
     }
 
-    req.plate = req.plate.toUpperCase();
+    body.plate = body.plate.toUpperCase();
 
-    if(!(await Vehiculos.findOne({plate:req.plate}))){
-        res.status(418).send(`${req.plate} plate is not in registry!`);
+    if(!(await Vehiculos.findOne({plate:body.plate}))){
+        res.status(418).send(`${body.plate} plate is not in registry!`);
         return;
     }
 
-    if(await Registro.findOne({plate:req.plate, checkOut : {"$exists" : false}})){
-        res.status(418).send(`${req.plate} already in!`);
+    if(await Registro.findOne({plate:body.plate, checkOut : {"$exists" : false}})){
+        res.status(418).send(`${body.plate} already in!`);
         return;
     }
 
-    var record = new Registro({
-        uid : await registryLength(),
-        plate : req.plate,
+    let record = new Registro({
+        uid : await Registro.find({}).count(),
+        plate : body.plate,
         checkIn : Math.floor(Date.now()/1000/60)
     });
 
     await record.save();
 
-    let output = `${req.plate} checked in!`;
-    console.log(output);
+    let output = `${body.plate} checked in!`;
     res.status(202).send(output);
-
-    async function registryLength(){
-        return await Registro.find({}).count();
-    }
 }
 
 module.exports ={
